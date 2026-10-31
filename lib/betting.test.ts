@@ -1,0 +1,6 @@
+import { describe,it,expect } from 'vitest';
+import { matchFixtureOdds } from './match-fixture-odds';
+export { matchFixtureOdds } from './match-fixture-odds';
+export function combinedOdds(prices:number[]){if(!prices.length||prices.some(x=>!Number.isFinite(x)||x<=1))throw new Error('invalid odds');return prices.reduce((a,b)=>a*b,1)}
+export function potentialReturn(stake:number,prices:number[]){if(!Number.isFinite(stake)||stake<=0)throw new Error('invalid stake');return Math.round(stake*combinedOdds(prices)*100)/100}
+describe('virtual betting maths',()=>{it('computes a single return',()=>expect(potentialReturn(100,[2.5])).toBe(250));it('combines accumulator prices',()=>expect(combinedOdds([2,3,1.5])).toBe(9));it('rejects odds <= 1',()=>expect(()=>potentialReturn(10,[1])).toThrow());it('does not match same teams on a different date',()=>expect(matchFixtureOdds({home:'Liverpool',away:'Ipswich',kickoff:'2024-08-17T11:30:00Z'},[{home_team:'Liverpool',away_team:'Ipswich',commence_time:'2026-11-08T14:00:00Z'}])).toBeUndefined());it('matches same teams and kickoff',()=>expect(matchFixtureOdds({home:'Liverpool',away:'Ipswich',kickoff:'2024-08-17T11:30:00Z'},[{home_team:'Liverpool',away_team:'Ipswich',commence_time:'2024-08-17T12:00:00Z'}])).toBeTruthy())});
